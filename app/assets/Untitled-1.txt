@@ -1,0 +1,46 @@
+ StreamBuilder<QuerySnapshot>(
+                stream:
+                    FirebaseFirestore.instance.collection('data').snapshots(),
+                builder:
+                    (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+                  if (snapshot.hasData) {
+                    final dataList = snapshot.data!.docs;
+
+                    return ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: dataList.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return InkWell(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => Productview(
+                                    title: dataList[index]['title'],
+                                    price: dataList[index]['price'],
+                                    quantity: dataList[index]['quantity'],
+                                    weight: dataList[index]['weight'],
+                                    image:
+                                        NetworkImage(dataList[index]['image'])),
+                              ),
+                            );
+                          },
+                          child: Itemcontainer(
+                              price: dataList[index]['price'],
+                              quantity: dataList[index]['quantity'],
+                              weight: dataList[index]['weight'],
+                              title: dataList[index]['title'],
+                              image: NetworkImage(dataList[index]['image'])),
+                        );
+                      },
+                    );
+                  } else if (snapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return Text("waiting");
+                  } else if (snapshot.hasError) {
+                    return Text("Error is here");
+                  } else {
+                    return CircularProgressIndicator();
+                  }
+                },
+              ),
